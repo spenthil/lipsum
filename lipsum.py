@@ -306,7 +306,7 @@ def _mean(values):
     return sum(values) / float(max(len(values), 1))
 
 def _variance(values):
-    squared = map(lambda x : x**2, values)
+    squared = list(map(lambda x : x**2, values))
     return _mean(squared) - _mean(values)**2
 
 def _sigma(values):
@@ -316,9 +316,8 @@ def _choose_closest(values, target):
     """
     Find the number in the list of values that is closest to the target.
     Prefer the first in the list.
-
     """
-    closest = values[0]
+    closest = list(values)[0]
     for value in values:
         if abs(target - value) < abs(target - closest):
             closest = value
@@ -497,7 +496,7 @@ class Generator(object):
         (in words) in a sample text.
         """
         sentences = filter(lambda s : len(s.strip()) > 0, _split_sentences(sample))
-        sentence_lengths = map(len, map(_split_words, sentences))
+        sentence_lengths = list(map(lambda a: len(list(a)), map(_split_words, sentences)))
         self.__generated_sentence_mean = _mean(sentence_lengths)
         self.__generated_sentence_sigma = _sigma(sentence_lengths)
 
@@ -507,7 +506,7 @@ class Generator(object):
         (in sentences) in a sample text.
         """
         paragraphs = filter(lambda s : len(s.strip()) > 0, _split_paragraphs(sample))
-        paragraph_lengths = map(len, map(_split_sentences, paragraphs))
+        paragraph_lengths = list(map(lambda a: len(list(a)), map(_split_sentences, paragraphs)))
         self.__generated_paragraph_mean = _mean(paragraph_lengths)
         self.__generated_paragraph_sigma = _sigma(paragraph_lengths)
 
@@ -610,7 +609,7 @@ class Generator(object):
         # Generate a sentence from the "chains"
         while len(sentence) < sentence_length:
             # If the current starting point is invalid, choose another randomly
-            if (not self.__chains.has_key(previous)):
+            if (previous not in self.__chains):
                 previous = self.__choose_random_start()
 
             # Choose the next "chain" to go to. This determines the next word
